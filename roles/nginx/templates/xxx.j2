@@ -1,0 +1,84 @@
+server {
+	listen {{ ansible_default_ipv4["address"] }}:80;
+	server_name {{ ansible_default_ipv4["address"] }};
+	root /xxx/current;
+
+	# обработка корня
+	location / {
+		root /xxx/current;
+		index index.php index.html;
+		if (!-e $request_filename) {
+			rewrite ^(/.*)$ /index.php?q=$1 last;
+			break;
+		}
+	}
+
+	# редирект с www
+	if ($host ~* www\.(.*)) {
+		set $host_without_www $1;
+		rewrite ^(.*)$ http://$host_without_www$1 permanent;
+	}
+
+	# обработка пхп файлов
+	location ~ ^/.*\.php$ {
+		root /xxx/current;
+		#include fastcgi_params;
+		fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+		fastcgi_hide_header X-Powered-By;
+		fastcgi_index index.php;
+
+		fastcgi_param DOCUMENT_ROOT /xxx/current;
+		fastcgi_param SCRIPT_FILENAME /xxx/current$fastcgi_script_name;
+		fastcgi_param PATH_TRANSLATED /xxx/current$fastcgi_script_name;
+
+		include fastcgi_params;
+
+		fastcgi_param QUERY_STRING $query_string;
+		fastcgi_param REQUEST_METHOD $request_method;
+		fastcgi_param CONTENT_TYPE $content_type;
+		fastcgi_param CONTENT_LENGTH $content_length;
+		fastcgi_param AUTH_USER $remote_user;
+		fastcgi_param REMOTE_USER $remote_user;
+		fastcgi_intercept_errors on;
+		fastcgi_ignore_client_abort off;
+		fastcgi_connect_timeout 100;
+		fastcgi_send_timeout 180;
+		fastcgi_read_timeout 180;
+		fastcgi_buffer_size 128k;
+		fastcgi_buffers 4 256k;
+		fastcgi_busy_buffers_size 256k;
+		fastcgi_temp_file_write_size 256k;
+
+		#dobavka_antiddos
+		# fastcgi_pass_header Cookie;
+		# fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
+		# fastcgi_cache_key "$server_addr:$server_port$request_uri|$cookie_phpsessid";
+		# fastcgi_cache fastcgi_cache;
+		# fastcgi_temp_path /tmp/nginx/temp 1 2;
+		# fastcgi_cache_use_stale updating error timeout invalid_header http_500;
+		# fastcgi_cache_valid 20s;
+		#konec_dobavki
+	}
+
+
+	# для иконки
+	location = /favicon.ico {
+		log_not_found off;
+		access_log off;
+	}
+
+	# для роботс
+	location = /robots.txt {
+		allow all;
+		log_not_found off;
+		access_log off;
+	}
+
+	location = /xmlrpc.php {
+		deny  all;
+		log_not_found off;
+		access_log off;
+	}
+
+	# конец полный сервер
+} 

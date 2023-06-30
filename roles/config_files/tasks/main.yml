@@ -1,0 +1,24 @@
+---
+# author: xxx
+
+- name: Creating directory /xxx
+  file:
+    path: /xxx
+    state: directory
+
+- name: Creating directory /xxx
+  file:
+    path: /xxx
+    state: directory
+
+- name: Transfer the config.php to raw folder
+  copy: 
+    src: config.php 
+    dest: /xxx
+    mode: 0644
+
+- name: Transfer the private_2.pem to raw folder
+  copy: 
+    src: private_2.pem 
+    dest: /xxx
+    mode: 0644

@@ -1,0 +1,19 @@
+---
+# author: xxx
+
+- name: Making xxx with Nginx and PHP-FPM
+  hosts: all
+  remote_user: root
+  # remote_user: user
+  # become: yes
+  # become_method: sudo
+
+  roles:
+    - {role: 'common', tags: 'common'}
+    - {role: 'php-fpm', tags: 'php-fpm'}
+    - {role: 'nginx', tags: 'nginx'}
+    - {role: 'logrotate', tags: 'logrotate'}
+    - {role: 'config_files', tags: 'config_files'}
+    - {role: 'monitoring', tags: 'monitoring'}
+    - {role: 'backuplogging', tags: 'backuplogging'}
+    - {role: 'uploadsshkeys', tags: 'uploadsshkeys'}

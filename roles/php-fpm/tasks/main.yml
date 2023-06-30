@@ -1,0 +1,39 @@
+---
+# author: xxx
+
+- name: Install a list of packages (php7.2-fpm)
+  apt:
+    pkg:
+      - php7.2-fpm   
+      - php7.2-dev
+      - php-pear
+
+- name: Transfer the aerospike.so
+  copy: src=aerospike.so dest=/usr/lib/php/20170718 mode=0644
+
+- name: Transfer the aerospike.ini
+  copy: src=aerospike.ini dest=/etc/php/7.2/mods-available mode=0644
+
+- name: Transfer the index.php
+  copy: src=index.php dest=/xxx mode=0644
+
+- name: Create symbolic link fpm/conf.d
+  file:
+    src: "/etc/php/7.2/mods-available/aerospike.ini"
+    dest: "/etc/php/7.2/fpm/conf.d/20-aerospike.ini"
+    state: link
+
+- name: Create symbolic link cli/conf.d
+  file:
+    src: "/etc/php/7.2/mods-available/aerospike.ini"
+    dest: "/etc/php/7.2/cli/conf.d/20-aerospike.ini"
+    state: link
+  notify: 
+    - Restart php-fpm
+    
+# for hard restart php-fpm
+# - name: Restarting php-fpm
+#   command: service php7.2-fpm restart
+
+
+

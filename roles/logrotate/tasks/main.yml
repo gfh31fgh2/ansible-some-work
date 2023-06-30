@@ -1,0 +1,13 @@
+---
+# author: xxx
+
+- name: Creating directory /xxx
+  file:
+    path: /xxx
+    state: directory
+
+- name: Transfer the xxx for logrotate to /etc/logrotate.d/ folder
+  copy: src=xxx dest=/etc/logrotate.d mode=0644
+
+- name: Logrotating new conf...
+  command: logrotate /etc/logrotate.conf

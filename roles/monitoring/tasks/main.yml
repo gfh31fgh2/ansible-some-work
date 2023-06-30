@@ -1,0 +1,59 @@
+---
+# author: xxx
+
+- name: Installing bc for ariphmetics
+  apt:
+    pkg:
+      - bc
+
+- name: Creating directory /home/monitoring 
+  ansible.builtin.file:
+    path: /home/monitoring
+    state: directory
+
+- name: Removing if exists /home/monitoring/monitoring.sh
+  ansible.builtin.file:
+    path: /home/monitoring/monitoring.sh
+    state: absent
+
+- name: Generate monitoring.sh script in /home/monitoring for download and installing Yandex Unified Agent
+  ansible.builtin.template: 
+    src: monitoring.j2 
+    dest: /home/monitoring/monitoring.sh 
+    mode: 0644 
+    owner: root 
+    group: root
+
+- name: Downloading last version of Yandex Unified Agent
+  ansible.builtin.command: sh /home/monitoring/monitoring.sh
+
+- name: Transfer the config.yml for yandex
+  ansible.builtin.copy: 
+    src: config.yml
+    dest: /etc/yandex/unified_agent 
+    mode: 0644
+
+- name: Restarting yandex unified-agent
+  ansible.builtin.command: systemctl restart unified-agent
+    
+
+# - name: Generate sh script for monitoring in /var/monitoring
+#   template: src=mem.j2 dest=/var/monitoring/mem.sh mode=0644 owner=root group=root
+
+# https://cloud.yandex.ru/docs/monitoring/concepts/data-collection/unified-agent/installation
+# first download file locally
+# ubuntu_name=/"ubuntu-18.04-bionic/" ua_version=$(curl -s https://storage.yandexcloud.net/yc-unified-agent/latest-version) bash -c 'curl -s -O https://storage.yandexcloud.net/yc-unified-agent/releases/${ua_version}/deb/${ubuntu_name}/yandex-unified-agent_${ua_version}_amd64.deb
+
+# - name: Downloading last version of Yandex Unified Agent
+#   ansible.builtin.command: 
+#     cmd: |
+#       ubuntu_name="ubuntu-18.04-bionic" ua_version=$(curl -s https://storage.yandexcloud.net/yc-unified-agent/latest-version) bash -c 'curl -s -O https://storage.yandexcloud.net/yc-unified-agent/releases/${ua_version}/deb/${ubuntu_name}/yandex-unified-agent_${ua_version}_amd64.deb'
+
+# ubuntu-14.04-trusty;
+# ubuntu-16.04-xenial;
+# ubuntu-18.04-bionic;
+# ubuntu-20.04-focal.
+
+# ubuntu_name="ubuntu-18.04-bionic" ua_version=$(curl -s https://storage.yandexcloud.net/yc-unified-agent/latest-version) bash -c 'curl -s -O https://storage.yandexcloud.net/yc-unified-agent/releases/${ua_version}/deb/${ubuntu_name}/yandex-unified-agent_${ua_version}_amd64.deb'
+
+# ubuntu_name="ubuntu-18.04-bionic" ua_version=$(curl -s https://storage.yandexcloud.net/yc-unified-agent/latest-version) bash -c 'curl -s -O https://storage.yandexcloud.net/yc-unified-agent/releases/21.02.05/deb/ubuntu-18.04-bionic/yandex-unified-agent_21.02.05_amd64.deb'

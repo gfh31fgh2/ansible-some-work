@@ -1,0 +1,57 @@
+---
+# author: xxx
+
+# - name: Installing bc for ariphmetics
+#   apt:
+#     pkg:
+#       - bc
+
+- name: Creating directory /home/logging 
+  ansible.builtin.file:
+    path: /home/logging
+    state: directory
+
+- name: Creating directory /home/backups_logs
+  ansible.builtin.file:
+    path: /home/backups_logs
+    state: directory
+
+- name: Transfer the zip_phpbackup.sh for logrotate to /home/logging folder
+  ansible.builtin.copy: src=zip_phpbackup.sh dest=/home/logging mode=0644
+
+- name: Transfer the zip_phpbackup.sh for logrotate to /home/logging folder
+  ansible.builtin.copy: src=puts3obj2yandexcloud.sh dest=/home/logging mode=0644
+
+- name: Transfer the zip_phpbackup.sh for logrotate to /home/logging folder
+  ansible.builtin.copy: src=del_zip.sh dest=/home/logging mode=0644
+
+- name: "Adding cron for zip_phpback.sh (making logs into zip)"
+  ansible.builtin.cron:
+    name: "### zip_phpback.sh for zipping phplogs (making it 3 числа месяца в 03:00 ночи)"
+    minute: "0"
+    hour: "3"
+    day: "3"
+    month: "*"
+    weekday: "*"
+    job: bash /home/logging/zip_phpback.sh
+
+
+- name: "Adding cron for puts3obj2yandexcloud.sh (sending zip file into s3)"
+  ansible.builtin.cron:
+    name: "### puts3obj2yandexcloud.sh for senging zip file to yandex cloud s3 (making it 3 числа месяца в 09:00 утра)"
+    minute: "0"
+    hour: "9"
+    day: "3"
+    month: "*"
+    weekday: "*"
+    job: bash /home/logging/puts3obj2yandexcloud.sh
+
+- name: "Adding cron for del_zip.sh (making logs into zip)"
+  ansible.builtin.cron:
+    name: "### del_zip.sh for delete zip file and old logs (making it 3 числа месяца в 11:30 утра)"
+    minute: "30"
+    hour: "11"
+    day: "3"
+    month: "*"
+    weekday: "*"
+    job: bash /home/logging/del_zip.sh

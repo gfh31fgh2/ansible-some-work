@@ -1,0 +1,33 @@
+---
+# author: xxx
+
+# - name: Upload ssh keys for gitlab
+#   apt:
+#     pkg:
+#       - bc
+
+- name: Add a new user named xxx
+  ansible.builtin.user:
+    name: "{{ gitlabuser_name }}"
+    comment: '4deploy'
+    shell: /bin/bash
+    append: yes
+    groups: sudo
+    password: "{{ gitlabuser_pass | password_hash('sha512') }}"
+
+- name: Upload SSH Key
+  ansible.posix.authorized_key: 
+    user: xxx
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', 'xxx.pub') }}"
+  notify: 
+    - restart ssh
+
+- name: Allow for {{ gitlabuser_name }} to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^{{ gitlabuser_name }}'
+    line: '{{ gitlabuser_name }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'

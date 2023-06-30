@@ -1,0 +1,26 @@
+#!/bin/bash
+
+osnumversion="{{ ansible_distribution_version }}"
+ubuntu_name=""
+
+if [ "$osnumversion" = "14.04" ]; then
+    ubuntu_name="ubuntu-14.04-trusty"
+elif [ "$osnumversion" = "16.04" ]; then
+    ubuntu_name="ubuntu-16.04-xenial"
+elif [ "$osnumversion" = "18.04" ]; then
+    ubuntu_name="ubuntu-18.04-bionic"
+elif [ "$osnumversion" = "20.04" ]; then
+    ubuntu_name="ubuntu-20.04-focal"
+fi
+
+ua_version=$(curl -s https://storage.yandexcloud.net/yc-unified-agent/latest-version)
+cd /home/monitoring
+curl -s -O "https://storage.yandexcloud.net/yc-unified-agent/releases/${ua_version}/deb/${ubuntu_name}/yandex-unified-agent_${ua_version}_amd64.deb"
+
+name_of_ya=$(find /home/monitoring/  -name "yandex-unified-agent*.deb")
+dpkg -i "$name_of_ya"
+# systemctl status unified-agent
+
+# restart service for working new config
+systemctl restart unified-agent
+

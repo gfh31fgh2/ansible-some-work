@@ -1,0 +1,9 @@
+/xxx/*.log {
+        rotate 30
+        daily
+	create
+        missingok
+        notifempty
+        compress
+        delaycompress
+}
